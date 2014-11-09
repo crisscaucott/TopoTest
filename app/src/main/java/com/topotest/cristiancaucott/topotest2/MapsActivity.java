@@ -1,22 +1,66 @@
 package com.topotest.cristiancaucott.topotest2;
 
+import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+
+import android.location.Criteria;
+import android.location.Location;
+import android.content.Context;
+
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.widget.Toast;
+
 
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private LocationManager locationManager;
+    private String provider;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        boolean gps_activado = service.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if(!gps_activado){
+            Toast.makeText(this, "GPS signal not found", Toast.LENGTH_LONG).show();
+        }
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+        mMap.setMyLocationEnabled(true);
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        // Define the criteria how to select the locatioin provider -> use
+        // default
+        Criteria criteria = new Criteria();
+        provider = locationManager.getBestProvider(criteria, false);
+        Location location = locationManager.getLastKnownLocation(provider);
+
+        // Initialize the location fields
+        if (location != null) {
+            Toast.makeText(this, "Selected Provider " + provider, Toast.LENGTH_SHORT).show();
+            onLocationChanged(location);
+        } else {
+
+            //do something
+        }
+
+
+    }
+
+    private void onLocationChanged(Location location) {
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+        Toast.makeText(this, "lat: " + lat + " lon: " + lon, Toast.LENGTH_SHORT).show();
     }
 
     @Override
