@@ -1,6 +1,10 @@
 package com.topotest.cristiancaucott.topotest2;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.location.LocationManager;
+import android.os.Build;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -13,28 +17,80 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.topotest.cristiancaucott.adapter.TabsPagerAdapter;
+
+import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Toast;
 
 
-public class MapsActivity extends FragmentActivity {
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+public class MapsActivity extends FragmentActivity implements ActionBar.TabListener {
 
+    /*
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationManager locationManager;
     private String provider;
+    */
+
+    private ViewPager viewPager;
+    private TabsPagerAdapter mAdapter;
+    private ActionBar actionBar;
+    // titulos de tabs
+    private String[] tabs = {"Tab1", "Tab2", "Tab3"};
 
 
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+        super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        setContentView(R.layout.activity_maps);
+
+        // inicializacion
+        viewPager = (ViewPager) findViewById(R.id.Pager);
+        actionBar = getActionBar();
+        mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
+
+        viewPager.setAdapter(mAdapter);
+        actionBar.setHomeButtonEnabled(false);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        for(String str : tabs){
+            actionBar.addTab(actionBar.newTab().setText(str).setTabListener(this));
+        }
+
+        // Eventos de cambios de paginas (fragments)
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener(){
+
+            @Override
+            public void onPageScrolled(int i, float v, int i2) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                actionBar.setSelectedNavigationItem(i);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
+        /*
         LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         boolean gps_activado = service.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if(!gps_activado){
             Toast.makeText(this, "GPS signal not found", Toast.LENGTH_LONG).show();
         }
-
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         mMap.setMyLocationEnabled(true);
 
@@ -53,37 +109,54 @@ public class MapsActivity extends FragmentActivity {
 
             //do something
         }
-
+        */
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_main_actions, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    // Eventos de los items
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Take appropriate action for each action item click
+        switch (item.getItemId()) {
+            case R.id.action_search:
+
+                return true;
+            case R.id.action_grupos:
+                // Lanzar actividad de grupos
+                gruposActivity();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void gruposActivity(){
+
+    }
+
+    // Evento cuando la posicion ha cambiado
     private void onLocationChanged(Location location) {
         double lat = location.getLatitude();
         double lon = location.getLongitude();
         Toast.makeText(this, "lat: " + lat + " lon: " + lon, Toast.LENGTH_SHORT).show();
     }
-
+/*
     @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-    }
+    }*/
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p>
-     * If it isn't installed {@link SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
+
+    /*
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
@@ -95,15 +168,28 @@ public class MapsActivity extends FragmentActivity {
                 setUpMap();
             }
         }
-    }
+    }*/
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
+
+    /*
     private void setUpMap() {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+    }
+    */
+
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        // Selecciona la vista dependiendo de que tab se hizo click
+        viewPager.setCurrentItem(tab.getPosition());
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
     }
 }
